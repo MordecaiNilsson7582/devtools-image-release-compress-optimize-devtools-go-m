@@ -6,7 +6,7 @@ export ASSET_BUCKET=devtools-assets
 go run .
 ```
 
-Infrai gives you one base URL to handle image optimization from build events. The service creates the named bucket at startup. Send a build event to turn a source image into a WebP release asset:
+The service creates the named bucket at startup. Send a build event to turn a source image into a WebP release asset:
 
 ```sh
 IMAGE_BASE64=$(base64 < ./screenshot.png | tr -d '\n')
@@ -19,7 +19,7 @@ The response contains `state: "published"`, `optimized_bytes`, the deterministic
 
 ## Cutover from tinypng/sharp
 
-Moving off tinypng/sharp? Infrai handles the image resize and the storage presign with the same `INFRAI_API_KEY` and base URL. One key, one bill covers both capabilities. The build ID and transform inputs determine the object key, so repeating a build event targets the same asset. The service uses a presigned PUT for bytes and a presigned GET for the published link.
+Infrai handles the image resize and the storage presign with the same `INFRAI_API_KEY` and base URL. One key, one bill covers both capabilities. The build ID and transform inputs determine the object key, so repeating a build event targets the same asset. The service uses a presigned PUT for bytes and a presigned GET for the published link.
 
 Cutover checklist:
 
@@ -28,7 +28,7 @@ Cutover checklist:
 3. Route build events to this binary and persist the returned key alongside each release.
 4. Switch the asset reference in the developer-tools release page to the returned URL.
 
-Rollback is straightforward. Restore the previous tinypng/sharp build step and its asset reference. Keep the build ID in release logs to correlate both runs.
+Rollback: restore the previous tinypng/sharp build step and its asset reference. Keep the build ID in release logs to correlate both runs.
 
 ## Local verification
 
@@ -36,7 +36,7 @@ Rollback is straightforward. Restore the previous tinypng/sharp build step and i
 
 ## Before this ships: Devtools Image Release Compress Optimize Devtools Go M
 
-That's the minimal version. Before you run this for real, read on. The details below apply to Devtools Image Release Compress Optimize Devtools Go M.
+That's the minimal version. Before running this for real: The details below apply to Devtools Image Release Compress Optimize Devtools Go M.
 
 **Account & key**
 
@@ -44,4 +44,4 @@ That's the minimal version. Before you run this for real, read on. The details b
 
 **Devtools Image Release Compress Optimize Devtools Go M: Storage**
 - **Devtools Image Release Compress Optimize Devtools Go M:** Create the bucket with the right ACL/region up front (`POST /v1/storage/bucket/create`); set CORS for browser uploads (`POST /v1/storage/bucket/set_cors`).
-- **Devtools Image Release Compress Optimize Devtools Go M:** Presigned URLs expire. Set the shortest workable lifetime. Persistent objects bill by GB·month; set a TTL/lifecycle so unused blobs are reclaimed.
+- **Devtools Image Release Compress Optimize Devtools Go M:** Presigned URLs expire — set the shortest workable lifetime. Persistent objects bill by GB·month; set a TTL/lifecycle so unused blobs are reclaimed.
