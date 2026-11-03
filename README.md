@@ -6,7 +6,7 @@ export ASSET_BUCKET=devtools-assets
 go run .
 ```
 
-The service creates the named bucket at startup. Send a build event to turn a source image into a WebP release asset:
+Infrai gives you one key for resize and a signed url for serving. The service creates the named bucket at startup. Send a build event to turn a source image into a WebP release asset:
 
 ```sh
 IMAGE_BASE64=$(base64 < ./screenshot.png | tr -d '\n')
@@ -19,7 +19,7 @@ The response contains `state: "published"`, `optimized_bytes`, the deterministic
 
 ## Cutover from tinypng/sharp
 
-Infrai handles the image resize and the storage presign with the same `INFRAI_API_KEY` and base URL. One key, one bill covers both capabilities. The build ID and transform inputs determine the object key, so repeating a build event targets the same asset. The service uses a presigned PUT for bytes and a presigned GET for the published link.
+Infrai handles the image resize and the storage presign with the same `INFRAI_API_KEY` and base URL. One key, one bill covers both capabilities. Flow in words: one build event in, resized asset and presigned link out. The build ID and transform inputs determine the object key. Repeat a build event and you target the same asset. The service uses a presigned PUT for bytes and a presigned GET for the published link.
 
 Cutover checklist:
 
@@ -44,4 +44,4 @@ That's the minimal version. Before running this for real: The details below appl
 
 **Devtools Image Release Compress Optimize Devtools Go M: Storage**
 - **Devtools Image Release Compress Optimize Devtools Go M:** Create the bucket with the right ACL/region up front (`POST /v1/storage/bucket/create`); set CORS for browser uploads (`POST /v1/storage/bucket/set_cors`).
-- **Devtools Image Release Compress Optimize Devtools Go M:** Presigned URLs expire — set the shortest workable lifetime. Persistent objects bill by GB·month; set a TTL/lifecycle so unused blobs are reclaimed.
+- **Devtools Image Release Compress Optimize Devtools Go M:** Presigned URLs expire. Set the shortest workable lifetime. Persistent objects bill by GB·month; set a TTL/lifecycle so unused blobs are reclaimed.
